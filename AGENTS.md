@@ -12,7 +12,7 @@ Python script that converts PDFs to EPUB 3 using DeepSeek LLM-powered formatting
 
 ## Key files
 - `script_converter.py` — Main converter (1600+ lines; the old heuristic/deterministic path was removed — LLM-only)
-- `test_script_converter.py` — 46 pytest tests (all passing)
+- `test_script_converter.py` — 49 pytest tests (all passing)
 - `README.md` — User-facing docs
 
 ## API key
@@ -59,32 +59,37 @@ Book title/author resolution order (highest wins):
 ## CLI usage
 
 ```bash
-# LLM conversion (requires API key)
+# LLM conversion (requires API key); EPUB lands in output/ by default
 export DEEPSEEK_API_KEY="sk-..."
-python3 script_converter.py input/book.pdf -o output/book.epub
+python3 script_converter.py input/book.pdf
+
+# Custom output path
+python3 script_converter.py input/book.pdf -o output/custom-name.epub
 
 # Control parallel workers (default: 48)
-python3 script_converter.py input/book.pdf -o output/book.epub --llm-workers 64
+python3 script_converter.py input/book.pdf --llm-workers 64
 
 # Skip epubcheck validation
-python3 script_converter.py input/book.pdf -o output/book.epub --no-validate
+python3 script_converter.py input/book.pdf --no-validate
 
 # Force OCR on all pages
-python3 script_converter.py input/book.pdf -o output/book.epub --force-ocr
+python3 script_converter.py input/book.pdf --force-ocr
 
 # Include embedded images
-python3 script_converter.py input/book.pdf -o output/book.epub --include-images
+python3 script_converter.py input/book.pdf --include-images
 
 # Control refinement iterations
-python3 script_converter.py input/book.pdf -o output/book.epub --llm-max-iterations 1
+python3 script_converter.py input/book.pdf --llm-max-iterations 1
 
 # Custom model
-python3 script_converter.py input/book.pdf -o output/book.epub --llm-model deepseek-chat
+python3 script_converter.py input/book.pdf --llm-model deepseek-chat
 
 # Override metadata (useful for scans with no embedded title/author)
-python3 script_converter.py input/book.pdf -o output/book.epub \
+python3 script_converter.py input/book.pdf \
     --title "The Historian's Craft" --author "Marc Bloch"
 ```
+
+Default output: `output/<pdf name>.epub` (via `_default_output_path` / `DEFAULT_OUTPUT_DIR` — the repo's `output/` folder next to the script). The destination folder is created if missing.
 
 ## Parallel chunk processing
 Chunks are processed concurrently via `concurrent.futures.ThreadPoolExecutor` (default: 48 workers). Since each chunk makes an I/O-bound HTTP call to the DeepSeek API, threads are the right primitive. A book split into N chunks completes in roughly the time of the single slowest chunk rather than N × chunk_time. Results are reassembled in original page order.

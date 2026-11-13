@@ -11,11 +11,11 @@ Usage:
     # Set API key (required — the only supported key source):
     export DEEPSEEK_API_KEY="sk-..."
 
-    # Convert (input/ and output/ are the conventional folders):
-    python3 script_converter.py input/my_book.pdf -o output/my_book.epub
+    # Convert — the EPUB lands in output/ by default:
+    python3 script_converter.py input/my_book.pdf
 
     # Override metadata (useful for scans without embedded title/author):
-    python3 script_converter.py input/my_book.pdf -o output/my_book.epub \
+    python3 script_converter.py input/my_book.pdf \
         --title "The Historian's Craft" --author "Marc Bloch"
 """
 
@@ -46,6 +46,9 @@ OPF_NS = "http://www.idpf.org/2007/opf"
 DC_NS = "http://purl.org/dc/elements/1.1/"
 NCX_NS = "http://www.daisy.org/z3986/2005/ncx/"
 CONTAINER_NS = "urn:oasis:names:tc:opendocument:xmlns:container"
+
+# Default EPUB destination: the repo's output/ folder next to this script
+DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 
 
 def _xml_declaration() -> str:
@@ -1399,6 +1402,11 @@ def convert_with_llm(pdf_path, output_path, pages, metadata, toc, api_key,
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 
+def _default_output_path(pdf_path: Path) -> Path:
+    """Default EPUB destination: output/<pdf name>.epub in the repo's output/ folder."""
+    return DEFAULT_OUTPUT_DIR / pdf_path.with_suffix(".epub").name
+
+
 def main():
     # Stream diagnostics line-by-line so progress is visible in terminals and
     # redirected log files while the run is in progress.
@@ -1416,7 +1424,7 @@ def main():
     )
     parser.add_argument(
         "-o", "--output",
-        help="Output EPUB path (default: same as input with .epub extension)",
+        help="Output EPUB path (default: output/<input name>.epub)",
     )
     parser.add_argument(
         "--no-ocr",
@@ -1474,7 +1482,8 @@ def main():
         print(f"Error: File not found: {pdf_path}", file=sys.stderr)
         sys.exit(1)
 
-    output_path = Path(args.output) if args.output else pdf_path.with_suffix(".epub")
+    output_path = Path(args.output) if args.output else _default_output_path(pdf_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"📄 Input:  {pdf_path}")
     print(f"📖 Output: {output_path}")

@@ -1,6 +1,7 @@
 """Tests for script_converter.py — TDD: Happy Path, Edge Cases, Error Cases, Integration."""
 
 import zipfile
+from pathlib import Path
 
 import pytest
 from PIL import Image
@@ -436,5 +437,29 @@ class TestExtractBlocksFromPage:
         texts = [b["text"] for b in blocks]
         assert any("Heading" in t for t in texts)
         assert any("Paragraph" in t for t in texts)
+
+
+# ── _default_output_path ──────────────────────────────────────────────────────
+
+class TestDefaultOutputPath:
+    """Tests for _default_output_path."""
+
+    def test_pdf_in_input_lands_in_output_folder(self):
+        result = sc._default_output_path(Path("input/book.pdf"))
+        assert result.name == "book.epub"
+        assert result.parent == sc.DEFAULT_OUTPUT_DIR
+        assert result.parent.name == "output"
+
+    def test_absolute_path_elsewhere_still_uses_output_folder(self):
+        result = sc._default_output_path(Path("/tmp/archive/some book.pdf"))
+        assert result.name == "some book.epub"
+        assert result.parent == sc.DEFAULT_OUTPUT_DIR
+
+    def test_multi_dot_stem_preserved(self):
+        result = sc._default_output_path(
+            Path("input/historia geral da africa sec XII ao XVI.pdf")
+        )
+        assert result.name == "historia geral da africa sec XII ao XVI.epub"
+        assert result.parent == sc.DEFAULT_OUTPUT_DIR
 
 

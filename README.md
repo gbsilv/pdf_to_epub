@@ -13,7 +13,7 @@ pdf_to_epub/
 ├── input/                  # Drop your PDFs here (folder tracked empty; contents gitignored)
 ├── output/                 # Generated EPUBs land here (folder tracked empty; contents gitignored)
 ├── script_converter.py     # Main converter
-├── test_script_converter.py # 46 pytest tests
+├── test_script_converter.py # 49 pytest tests
 ├── AGENTS.md               # Technical project notes
 └── venv/                   # Python virtualenv (gitignored)
 ```
@@ -48,11 +48,11 @@ If the variable is not set, the script exits with an error.
 ## Usage
 
 ```bash
-# Basic conversion
+# Basic conversion — the EPUB lands in output/ by default
 ./venv/bin/python script_converter.py input/book.pdf
 
-# Explicit output path (defaults to <input>.epub next to the PDF)
-./venv/bin/python script_converter.py input/book.pdf -o output/book.epub
+# Custom output path
+./venv/bin/python script_converter.py input/book.pdf -o output/custom-name.epub
 
 # Override metadata (useful for scans with no embedded title/author)
 ./venv/bin/python script_converter.py input/book.pdf \
@@ -63,7 +63,7 @@ If the variable is not set, the script exits with an error.
 
 | Flag | Default | Description |
 |---|---|---|
-| `-o, --output` | `<input>.epub` | Output EPUB path |
+| `-o, --output` | `output/<name>.epub` | Output EPUB path |
 | `--no-ocr` | off | Disable OCR fallback (native text only) |
 | `--force-ocr` | off | Force OCR on all pages, ignore native text |
 | `--include-images` | off | Embed figures/illustrations (off by default to avoid full-page scans) |
@@ -153,4 +153,4 @@ The parser also handles an XML+CDATA format as a fallback for refinement iterati
 ./venv/bin/python -m pytest test_script_converter.py -v
 ```
 
-46 tests, all passing.
+49 tests, all passing.
