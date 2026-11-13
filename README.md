@@ -10,8 +10,8 @@ The LLM is the **only** conversion path: a DeepSeek API key is always required.
 
 ```
 pdf_to_epub/
-├── input/                  # Drop your PDFs here (gitignored)
-├── output/                 # Generated EPUBs land here (gitignored)
+├── input/                  # Drop your PDFs here (folder tracked empty; contents gitignored)
+├── output/                 # Generated EPUBs land here (folder tracked empty; contents gitignored)
 ├── script_converter.py     # Main converter
 ├── test_script_converter.py # 46 pytest tests
 ├── AGENTS.md               # Technical project notes
@@ -87,7 +87,28 @@ If the variable is not set, the script exits with an error.
 9. Build the EPUB and validate it with epubcheck.
 10. Refinement loop (up to 3 iterations) if quality or validation issues are found.
 
-All diagnostics stream live line-by-line, so progress is visible in the terminal or in a redirected log file while the run is in progress.
+All diagnostics stream live line-by-line, so progress is visible in the terminal or in a redirected log file while the run is in progress. The beginning of a typical run looks like this:
+
+```
+📋 Reading metadata...
+   Title:  História geral da África, IV: África do século XII ao XVI
+   Author: Niane, Djibril Tamsir; ...
+
+📑 Reading table of contents...
+   Found 1 TOC entries
+
+🔎 Scanning text layer (sampled pages)...
+   Native text layer on 5/5 sampled pages (100%)
+   ✅ OCR unlikely to be needed
+
+📝 Extracting text (with OCR fallback)...
+   ... 100/873 pages extracted
+   ... 200/873 pages extracted
+   ...
+   Total pages: 873
+   Native text: 873 pages
+   OCR fallback: 0 pages
+```
 
 ### Metadata resolution
 
@@ -133,9 +154,3 @@ The parser also handles an XML+CDATA format as a fallback for refinement iterati
 ```
 
 46 tests, all passing.
-
-## Known limitations
-
-- DeepSeek output token limits (~8K–32K) mean very long single calls may summarize — solved by chunking.
-- macOS SSL certificate issues: the script falls back to an unverified SSL context if certificate verification fails.
-- OCR requires `tesseract` installed on the system (`brew install tesseract`).
