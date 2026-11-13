@@ -1,11 +1,17 @@
-# Input PDFs (source books) — not tracked
-input/
+# Input PDFs (source books) — not tracked, but the folder itself is kept
+# in the repo via .gitkeep
+input/*
+!input/.gitkeep
 
-# Generated EPUBs — build artifacts, not tracked
-output/
+# Generated EPUBs — build artifacts, not tracked (folder kept via .gitkeep)
+output/*
+!output/.gitkeep
 
 # Secrets — never commit API keys
 .env
+
+# macOS
+.DS_Store
 
 # Python
 venv/
