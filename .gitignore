@@ -1,0 +1,14 @@
+# Input PDFs (source books) — not tracked
+input/
+
+# Generated EPUBs — build artifacts, not tracked
+output/
+
+# Secrets — never commit API keys
+.env
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
